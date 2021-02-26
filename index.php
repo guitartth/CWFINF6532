@@ -1,13 +1,148 @@
 <?php
-// INF653 VB Week 4 Project
+// INF653 VB Week 5 Project
 // Author: Craig Freeburg
-// Date: 2/15/21
+// Date: 3/1/21
 
-require('database.php');
+require('model/database.php');
+require('model/category_db.php');
+require('model/item_db.php');
 
-$newTask = filter_input(INPUT_POST, "newTask", FILTER_SANITIZE_STRING);
-$newDesc = filter_input(INPUT_POST, "newDesc", FILTER_SANITIZE_STRING);
 
+$item_id = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
+if(!$item_id)
+{
+    $item_id = filter_input(INPUT_GET, 'item_id', FILTER_VALIDATE_INT);
+}
+
+$title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_STRING);
+if(!$title)
+{
+    $title = filter_input(INPUT_GET, 'title', FILTER_SANITIZE_STRING);
+}
+
+$desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
+if(!$desc)
+{
+    $desc = filter_input(INPUT_GET, 'desc', FILTER_SANITIZE_STRING);
+}
+
+$category_name = filter_input(INPUT_POST, 'category_name', FILTER_SANITIZE_STRING);
+if(!$category_name)
+{
+    $category_name = filter_input(INPUT_GET, 'category_name', FILTER_SANITIZE_STRING);
+}
+
+$category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+if(!$category_id)
+{
+    $category_id = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT);
+}
+
+$action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
+if(!$action)
+{
+    $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+    if(!$action)
+    {
+        $action = 'list_items';
+    }
+}
+
+//Gray filters $item_id, $title, $desc, $category_name, $category_id, $action
+
+
+switch ($action)
+{
+    case "list_tasks":
+
+        break;
+    default:
+        $category_name = get_category_name($category_id);
+        $categories = get_categories();
+        $tasks = get_tasks_by_category($category_id);
+        include('view/item_list.php');
+
+}
+
+if($action == 'list_tasks')
+{
+    $category_id = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT);
+    if($category_id == NULL || $category_id == FALSE)
+    {
+        $category_id = 1;
+    }
+    $category_name = get_category_name($category_id);
+    $categories = get_categories();
+    $tasks = get_tasks_by_category($category_id);
+    include('view/item_list.php');
+}
+else if($action == 'delete_task')
+{
+    $task_id = filter_input(INPUT_POST, 'task_id', FILTER_VALIDATE_INT);
+    $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+    if($category_id == NULL || $category_id == FALSE || $task_id == NULL || $task_id == FALSE)
+    {
+        $error = "missing or incorrect task id or category id.";
+        include('view/error.php');
+    }
+    else
+    {
+        delete_task($task_id);
+        header("Location: .?category_id=$category_id");
+    }
+}
+else if($action == "delete_category")
+{
+    $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+    if($category_id == NULL || $category_id == FALSE)
+    {
+        $error = "no existing category selected.";
+        include('view/error.php');
+    }
+    else
+    {
+        delete_category($category_id);
+        header("Location: .?category_id=$category_id");
+    }
+}
+//not positive this is needed. I believe it depends on if adding form is on the same page or not
+else if($action == "show_add_form")
+{
+    $categories = get_categories();
+    //this file doesn't exist yet - either create file or direct the include to the correct file
+    include('view/add_task.php');
+}
+else if($action == "add_task")
+{
+    $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+    $title = filter_input(INPUT_POST, 'title');
+    $desc = filter_input(INPUT_POST, 'desc');
+    if($category_id == NULL || $category_id == FALSE || $title == NULL || $title == FALSE || $desc == NULL || $desc == FALSE)
+    {
+        $error = "Invalid task data. Check all fields and try again.";
+        include('view/error.php');
+    }
+    else
+    {
+        add_task($category_id, $name, $desc);
+        header("Location: .?category_id=$category_id");
+    }
+}
+else if ($action == "add_category")
+{
+    $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+    $name = filter_input(INPUT_POST, 'name');
+    if($category_id == NULL || $category_id == FALSE || $name == NULL || $name == FALSE)
+    {
+        $error = "Invalid category data. Check all fields and try again.";
+        include('view/error.php');
+    }
+    else
+    {
+        add_category($category_id);
+        header("Location: .?category_id=$category_id");
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +152,7 @@ $newDesc = filter_input(INPUT_POST, "newDesc", FILTER_SANITIZE_STRING);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Craig's To Do List</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="view/css/main.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 </head>

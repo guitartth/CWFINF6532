@@ -28,7 +28,7 @@ html {
   }
   body {
     text-align: center;
-    background-image: url("paper.jpg");
+    background-image: url("./view/css/paper.jpg");
     background-size: cover;
   }
   
