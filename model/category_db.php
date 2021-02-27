@@ -48,6 +48,7 @@ function add_category($category_name)
     $statement->bindValue(':category_name', $category_name);
     $statement->execute();
     $statement->closeCursor();
+    echo '<script>alert("Task successfully added.")</script>';
 }
 
 ?>

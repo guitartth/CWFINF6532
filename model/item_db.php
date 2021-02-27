@@ -40,5 +40,6 @@ function add_task($category_id, $task_title, $task_desc)
     $statement->bindValue(':task_desc', $task_desc);
     $statement->execute();
     $statement->closeCursor();
+    echo '<script>alert("Task successfully added.")</script>';
 }
 ?>

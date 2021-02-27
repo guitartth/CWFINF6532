@@ -1,5 +1,9 @@
 html {
     display: inline;
+    text-align: center;
+    background-image: url("./paper.jpg");
+    background-size: cover;
+    font-family: 'Permanent Marker', cursive;
   }
   
   header{
@@ -10,7 +14,7 @@ html {
     margin-bottom: -110px;
   }
   
-  h2 {
+  h2, h3 {
     font-family: 'Permanent Marker', cursive;
     text-align:center;
     font-size: 40px;
@@ -27,9 +31,7 @@ html {
     
   }
   body {
-    text-align: center;
-    background-image: url("./view/css/paper.jpg");
-    background-size: cover;
+    
   }
   
   input {
