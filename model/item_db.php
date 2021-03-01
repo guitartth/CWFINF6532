@@ -5,30 +5,46 @@
 
 function get_tasks_by_category($category_id){
     global $db;
-    $query = 'SELECT * FROM todoitems
-              WHERE todoitems.categoryId = :category_id
-              ORDER BY ItemNum';
+    if ($category_id)
+    {
+        
+        $query = 'SELECT I.ItemNum, I.Title, I.Description, C.categoryName FROM todoitems I LEFT JOIN
+        categories C ON I.categoryID = C.categoryID WHERE I.categoryID = :category_id ORDER BY
+        I.ItemNum';
+    }
+    else
+    {
+        
+        $query = 'SELECT I.ItemNum, I.Title, I.Description, C.categoryName FROM todoitems I LEFT JOIN
+        categories C ON I.categoryID = C.categoryID ORDER BY C.categoryName';
+    }
     $statement = $db->prepare($query);
-    $statement->bindValue(':category_id', $category_id);
+    if($category_id)
+    {
+        $statement->bindValue(':category_id', $category_id);
+    }
     $statement->execute();
-    $tasks = $statement->fetchAll();
+    $items = $statement->fetchAll();
     $statement->closeCursor();
-    return $tasks;          
+    return $items;              
 }
 
-function delete_task($task_id)
+function delete_task($item_id)
 {
+    
     global $db;
     $query = 'DELETE FROM todoitems
-              WHERE ItemNum = :task_id';
+              WHERE ItemNum = :item_id';
     $statement = $db->prepare($query);
-    $statement->bindValue(':task_id', $task_id);
+    $statement->bindValue(':item_id', $item_id);
     $statement->execute();
+    
     $statement->closeCursor();
 }
 
 function add_task($category_id, $task_title, $task_desc)
 {
+    
     global $db;
     $query = 'INSERT INTO todoitems
                 (categoryId, Title, Description)
@@ -38,8 +54,8 @@ function add_task($category_id, $task_title, $task_desc)
     $statement->bindValue(':category_id', $category_id);
     $statement->bindValue(':task_title', $task_title);
     $statement->bindValue(':task_desc', $task_desc);
-    $statement->execute();
-    $statement->closeCursor();
-    echo '<script>alert("Task successfully added.")</script>';
+    
+    $statement->execute();  
+    $statement->closeCursor();    
 }
 ?>

@@ -9,10 +9,7 @@ require('model/item_db.php');
 
 
 $item_id = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
-if(!$item_id)
-{
-    $item_id = filter_input(INPUT_GET, 'item_id', FILTER_VALIDATE_INT);
-}
+
 
 $title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_STRING);
 if(!$title)
@@ -44,7 +41,8 @@ if(!$action)
     $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
     if(!$action)
     {
-        $action = 'list_items';
+        //Needs to be list categories or tasks - default for testing
+        $action = 'default';
     }
 }
 
@@ -53,59 +51,79 @@ if(!$action)
 
 switch ($action)
 {
-    case "list_tasks":
-        $tasks = get_tasks_by_category($category_id);
-        include('view/item_list.php');
+    case "list_categories":
+        $categories = get_categories();
+        include('view/category_list.php');
         break;
 
     case "add_task":
+        
         if ($title && $desc && $category_id) {
+            
             add_task($category_id, $title, $desc);
-            header("Location: .?action=list_tasks&category_id=$category_id");
+            
         } else {
+            
             $error = "Invalid task data. Check all fields and try again.";
             include('view/error.php');
             exit();
         }
+        echo '<script>alert("Task successfully added!")</script>';
+        header("Location: .?category_id=$category_id");
         break;
 
     case "delete_task":
-        if($task_id)
+        
+        if($item_id)
         {
+            
             try 
-            {
-                delete_task($task_id);
+            {       
+                delete_task($item_id);
             }
             catch (PDOException $e)
             {
                 $error = "Cannot delete category with tasks existing.";
                 include('view/error.php');
-                exit();
             }
-            header("Location: .?action=");
+            echo '<script>alert("Task successfully deleted!")</script>';
+            header("Location: .?category_id=$category_id");
         }
-        
-        header("Location: .?action=");
         break;
-
+    case "modify_categories":
+        include('view/category_list.php');
+        break;
     case "add_category":
+        
         if($category_name)
         {
             add_category($category_name);
-            header("Location: .?action=");
+            header("Location: .?action=default");
+            echo '<script>alert("Category successfully added!")</script>';
+            break;
         }
-      
+    case "delete_category":
+        if($category_id)
+        {
+            try 
+            {
+                delete_category($category_id);
+            }
+            catch (PDOException $e)
+            {
+                $error = "You cannot delete a category that has tasks assigned to it.";
+                include('view/error.php');
+                exit();
+            }
+            echo '<script>alert("Category successfully deleted!")</script>';
+            header("Location: .?action=default");
+        }
     default:
         $category_name = get_category_name($category_id);
         $categories = get_categories();
-        $tasks = get_tasks_by_category($category_id);
+        $items = get_tasks_by_category($category_id);
         include('view/item_list.php');
-
 }
-
-
-
-
 
 ?>
 
