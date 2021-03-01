@@ -31,14 +31,12 @@ function get_tasks_by_category($category_id){
 
 function delete_task($item_id)
 {
-    
     global $db;
     $query = 'DELETE FROM todoitems
               WHERE ItemNum = :item_id';
     $statement = $db->prepare($query);
     $statement->bindValue(':item_id', $item_id);
     $statement->execute();
-    
     $statement->closeCursor();
 }
 

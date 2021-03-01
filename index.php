@@ -51,11 +51,6 @@ if(!$action)
 
 switch ($action)
 {
-    case "list_categories":
-        $categories = get_categories();
-        include('view/category_list.php');
-        break;
-
     case "add_task":
         
         if ($title && $desc && $category_id) {
@@ -76,32 +71,28 @@ switch ($action)
         
         if($item_id)
         {
-            
             try 
             {       
                 delete_task($item_id);
+                echo '<script>alert("Task successfully deleted!")</script>';
             }
             catch (PDOException $e)
             {
                 $error = "Cannot delete category with tasks existing.";
                 include('view/error.php');
             }
-            echo '<script>alert("Task successfully deleted!")</script>';
             header("Location: .?category_id=$category_id");
         }
         break;
     case "modify_categories":
+        $categories = get_categories();
         include('view/category_list.php');
         break;
     case "add_category":
-        
-        if($category_name)
-        {
-            add_category($category_name);
-            header("Location: .?action=default");
-            echo '<script>alert("Category successfully added!")</script>';
-            break;
-        }
+        add_category($category_name);
+        header("Location: .?action=modify_categories");
+        echo '<script>alert("Category successfully added!")</script>';
+        break;
     case "delete_category":
         if($category_id)
         {
@@ -116,7 +107,7 @@ switch ($action)
                 exit();
             }
             echo '<script>alert("Category successfully deleted!")</script>';
-            header("Location: .?action=default");
+            header("Location: .?action=modify_categories");
         }
     default:
         $category_name = get_category_name($category_id);

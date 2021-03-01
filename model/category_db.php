@@ -1,8 +1,7 @@
 <?php
 
 function get_categories()
-{
-    
+{ 
     global $db;
     $query = 'SELECT * FROM categories
               ORDER BY categoryID';
@@ -43,8 +42,7 @@ function delete_category($category_id)
 }
 
 function add_category($category_name)
-{
-    
+{ 
     global $db;
     $query = 'INSERT INTO categories
                 (categoryName)
@@ -54,7 +52,6 @@ function add_category($category_name)
     $statement->bindValue(':category_name', $category_name);
     $statement->execute();
     $statement->closeCursor();
-    
 }
 
 ?>
